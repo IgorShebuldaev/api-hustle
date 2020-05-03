@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask import jsonify
+import argparse
 
 app = Flask(__name__)
 
@@ -19,5 +20,15 @@ def root():
         }])
 
 
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+
 if __name__ == '__main__':
-    app.run()
+    parser = argparse.ArgumentParser(description="Run Flask server")
+    parser.add_argument('-p', '--port', default=5000, help='Specify port')
+    
+    args = parser.parse_args()
+
+    app.run(port=args.port)
