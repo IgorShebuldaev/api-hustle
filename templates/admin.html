@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <title>Admin Panel</title>
+  </head>
+  <style>
+    .node {
+      margin-bottom: 2em;
+    }
+  </style>
+  <body>
+    <h3>Admin Panel</h3>
+    <h4>News management</h4>
+
+    <form id='news_form' action='{{ save_url }}' method='POST'>
+      <section id='news'>
+      </section>
+      
+      <button type='submit'>Save</button>
+      <button onclick='addRow();return false;'>Add post</button>
+    </form>
+  </body>
+  <script>
+    let lastNodeId = 0;
+    const newsSection = document.getElementById('news');
+
+    const addRow = function() {
+      lastNodeId++;
+      const element = buildRow({ id: lastNodeId, title: '', text: '' });
+
+      newsSection.appendChild(element);
+    };
+
+    const removeNode = function(event) {
+      event.parentElement.remove();
+    };
+
+    const buildRow = function(node) {
+      lastNodeId = Math.max(lastNodeId, node.id);
+
+      const div = document.createElement('div');
+      div.id = node.id;
+      div.className = 'node';
+      div.innerHTML = `
+        <input type='hidden' name='node_id[${node.id}]' value='${node.id}' />
+        <input type='text' placeholder='Title' name='title[${node.id}]' value='${node.title}' />
+        <input type='text' placeholder='Text' name='text[${node.id}]'value='${node.text}' />
+        <button onClick='removeNode(this); return false'>Del</button>
+      `;
+
+      return div;
+    }
+
+    const buildForm = function(json) {
+      for(node of json) {
+        const element = buildRow(node);
+
+        newsSection.appendChild(element);
+      }
+    };
+
+    fetch('{{ news_url }}').then((response) => {
+      response.json().then((json) => {
+        buildForm(json);
+      })
+    });
+  </script>
+</html>
